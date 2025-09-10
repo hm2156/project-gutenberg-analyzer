@@ -1,70 +1,113 @@
-# Getting Started with Create React App
+# Project Gutenberg Character Analyzer
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+An AI-powered web application that analyzes character relationships in classic literature from Project Gutenberg books. Discover hidden connections between characters using interactive network visualizations.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- 📚 **AI-Powered Analysis**: Uses Groq API to analyze character relationships
+- 🎨 **Interactive Visualization**: D3.js network graphs showing character connections
+- 🌙 **Dark Mode UI**: Modern dark theme with Tailwind CSS
+- 📱 **Responsive Design**: Works on desktop and mobile devices
+- 🔍 **Smart Text Sampling**: Handles long books efficiently
+- 🚀 **Real-time Analysis**: Fast character relationship detection
 
-### `npm start`
+## Technologies Used
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Frontend**: React.js, Tailwind CSS, D3.js
+- **Backend**: Groq API (LLM), Project Gutenberg API
+- **Build Tools**: Create React App, PostCSS
+- **Deployment**: Ready for Vercel, Netlify, or GitHub Pages
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Getting Started
 
-### `npm test`
+### Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js (v14 or higher)
+- npm or yarn
+- Groq API key
 
-### `npm run build`
+### Installation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Clone the repository:
+```bash
+git clone https://github.com/hm2156/project-gutenberg-analyzer.git
+cd project-gutenberg-analyzer
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. Install dependencies:
+```bash
+npm install
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. Create a `.env` file in the root directory:
+```env
+REACT_APP_GROQ_API_KEY=your_groq_api_key_here
+```
 
-### `npm run eject`
+4. Get your Groq API key from [https://console.groq.com/keys](https://console.groq.com/keys)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+5. Start the development server:
+```bash
+npm start
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+6. Open [http://localhost:3000](http://localhost:3000) to view the application
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Usage
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+1. Enter a Project Gutenberg book ID (e.g., 11 for Alice's Adventures in Wonderland)
+2. Click "Analyze Characters" to start the AI analysis
+3. View the interactive character network visualization
+4. Explore character relationships and interaction strengths
 
-## Learn More
+### Popular Book IDs to Try
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- **11** - Alice's Adventures in Wonderland
+- **74** - The Adventures of Tom Sawyer
+- **46** - A Christmas Carol
+- **1661** - The Adventures of Sherlock Holmes
+- **2701** - Moby Dick
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## How It Works
 
-### Code Splitting
+1. **Book Fetching**: Downloads book content from Project Gutenberg using a CORS proxy
+2. **Text Processing**: Cleans and samples the text for AI analysis
+3. **AI Analysis**: Uses Groq's LLM to identify characters and their relationships
+4. **Visualization**: Creates an interactive D3.js network graph
+5. **Display**: Shows character details and relationship descriptions
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Project Structure
 
-### Analyzing the Bundle Size
+```
+src/
+├── components/
+│   ├── BookInput.js          # User input component
+│   ├── CharacterNetwork.js   # D3.js visualization
+│   ├── LoadingSpinner.js    # Loading indicator
+│   └── ResultsDisplay.js     # Results display
+├── Gutenberg/
+│   └── llmService.js        # Groq API integration
+├── services/
+│   └── gutenbergApi.js      # Project Gutenberg API
+├── App.js                   # Main application component
+└── index.js                 # Application entry point
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Contributing
 
-### Making a Progressive Web App
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## License
 
-### Advanced Configuration
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Acknowledgments
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- [Project Gutenberg](https://www.gutenberg.org/) for providing free e-books
+- [Groq](https://groq.com/) for AI API services
+- [D3.js](https://d3js.org/) for data visualization
+- [Tailwind CSS](https://tailwindcss.com/) for styling
