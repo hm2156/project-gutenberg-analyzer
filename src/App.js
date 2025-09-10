@@ -67,10 +67,10 @@ function App() {
               </p>
             </div>
 
-            {/* ADD THE NETWORK VISUALIZATION HERE */}
+            
             <CharacterNetwork data={analysisResults} />
 
-            {/* Character List */}
+            
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-gray-800 rounded-lg shadow-lg p-6 border border-gray-700">
                 <h3 className="text-xl font-semibold mb-4 text-white">Main Characters</h3>

@@ -4,11 +4,11 @@ const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 export const analyzeCharacters = async (bookText) => {
   try {
-    // Check if API key is available
+   
     const apiKey = process.env.GROQ_API_KEY || process.env.REACT_APP_GROQ_API_KEY;
 
-    // Very conservative text limit for Groq API
-    const maxTextLength = 10000; // Even smaller to be safe
+ 
+    const maxTextLength = 10000; 
     let truncatedText;
     
     if (bookText.length > maxTextLength) {

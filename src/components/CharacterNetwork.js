@@ -8,7 +8,7 @@ const CharacterNetwork = ({ data }) => {
     if (!data || !data.characters || !data.interactions) return;
 
     const svg = d3.select(svgRef.current);
-    svg.selectAll("*").remove(); // Clear previous visualization
+    svg.selectAll("*").remove(); 
 
     const width = 900;
     const height = 700;
@@ -16,7 +16,7 @@ const CharacterNetwork = ({ data }) => {
     
     svg.attr("width", width).attr("height", height);
 
-    // Create nodes for ALL characters from the main characters breakdown
+
     const nodes = data.characters.map(char => ({
       id: char.name,
       mentions: char.mentions,
@@ -27,10 +27,10 @@ const CharacterNetwork = ({ data }) => {
       ).length
     }));
 
-    // Create bidirectional links from interactions
+
     const links = [];
     data.interactions.forEach(interaction => {
-      // Add both directions for bidirectional relationships
+
       links.push({
         source: interaction.character1,
         target: interaction.character2,
@@ -47,10 +47,10 @@ const CharacterNetwork = ({ data }) => {
       });
     });
 
-    // Single color for all nodes (clean, uniform look) - dark mode
-    const nodeColor = "#60A5FA"; // Light blue for dark mode
 
-    // Create force simulation with better parameters for connected networks
+    const nodeColor = "#60A5FA"; 
+
+
     const simulation = d3.forceSimulation(nodes)
       .force("link", d3.forceLink(links).id(d => d.id).distance(120).strength(0.8))
       .force("charge", d3.forceManyBody().strength(-300))
@@ -59,7 +59,7 @@ const CharacterNetwork = ({ data }) => {
       .force("x", d3.forceX(width / 2).strength(0.1))
       .force("y", d3.forceY(height / 2).strength(0.1));
 
-    // Create minimal, clean arrow markers
+  
     svg.append("defs").append("marker")
       .attr("id", "arrowhead")
       .attr("viewBox", "0 0 10 10")
@@ -73,10 +73,10 @@ const CharacterNetwork = ({ data }) => {
       .attr("fill", "#9CA3AF")
       .attr("stroke", "none");
 
-    // Create container for zoom
+
     const container = svg.append("g");
 
-    // Add zoom behavior
+
     const zoom = d3.zoom()
       .scaleExtent([0.5, 3])
       .on("zoom", (event) => {
@@ -85,18 +85,18 @@ const CharacterNetwork = ({ data }) => {
     
     svg.call(zoom);
 
-    // Create links (edges) with thin lines and clean arrowheads
+
     const link = container.append("g")
       .selectAll("line")
       .data(links)
       .join("line")
       .attr("stroke", "#9CA3AF")
       .attr("stroke-opacity", 0.8)
-      .attr("stroke-width", 1.5) // Thin lines
+      .attr("stroke-width", 1.5) 
       .attr("marker-end", "url(#arrowhead)")
       .style("cursor", "pointer");
 
-    // Create nodes (characters) with uniform color - dark mode
+  
     const node = container.append("g")
       .selectAll("circle")
       .data(nodes)
@@ -112,7 +112,7 @@ const CharacterNetwork = ({ data }) => {
         .on("drag", dragged)
         .on("end", dragended));
 
-    // Add character name labels with dark mode styling
+
     const label = container.append("g")
       .selectAll("text")
       .data(nodes)
@@ -127,7 +127,6 @@ const CharacterNetwork = ({ data }) => {
       .style("user-select", "none")
       .style("filter", "drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))");
 
-    // Add tooltips
     const tooltip = d3.select("body").append("div")
       .attr("class", "tooltip")
       .style("position", "absolute")
@@ -139,7 +138,6 @@ const CharacterNetwork = ({ data }) => {
       .style("pointer-events", "none")
       .style("opacity", 0);
 
-    // Node hover effects
     node
       .on("mouseover", (event, d) => {
         tooltip.transition().duration(200).style("opacity", 0.9);
@@ -151,13 +149,12 @@ const CharacterNetwork = ({ data }) => {
         .style("left", (event.pageX + 10) + "px")
         .style("top", (event.pageY - 28) + "px");
         
-        // Highlight connected nodes
+      
         node.style("opacity", 0.3);
         link.style("opacity", 0.1);
         
         d3.select(event.target).style("opacity", 1);
         
-        // Highlight connected links and nodes
         link.filter(l => l.source.id === d.id || l.target.id === d.id)
           .style("opacity", 1)
           .style("stroke", "#ff6b6b")
@@ -173,14 +170,14 @@ const CharacterNetwork = ({ data }) => {
       .on("mouseout", () => {
         tooltip.transition().duration(500).style("opacity", 0);
         
-        // Reset styles
+        
         node.style("opacity", 1);
         link.style("opacity", 0.8)
           .style("stroke", "#999")
           .style("stroke-width", d => d.width);
       });
 
-    // Link hover effects
+    
     link.on("mouseover", (event, d) => {
       tooltip.transition().duration(200).style("opacity", 0.9);
       tooltip.html(`
@@ -195,7 +192,7 @@ const CharacterNetwork = ({ data }) => {
       tooltip.transition().duration(500).style("opacity", 0);
     });
 
-    // Update positions on simulation tick
+    
     simulation.on("tick", () => {
       link
         .attr("x1", d => d.source.x)
@@ -212,7 +209,7 @@ const CharacterNetwork = ({ data }) => {
         .attr("y", d => d.y);
     });
 
-    // Drag functions
+   
     function dragstarted(event, d) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
       d.fx = d.x;
@@ -230,7 +227,7 @@ const CharacterNetwork = ({ data }) => {
       d.fy = null;
     }
 
-    // Cleanup function
+    
     return () => {
       d3.select("body").selectAll(".tooltip").remove();
     };
