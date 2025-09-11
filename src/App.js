@@ -3,7 +3,7 @@ import BookInput from './components/BookInput';
 import LoadingSpinner from './components/LoadingSpinner';
 import CharacterNetwork from './components/CharacterNetwork';
 import { fetchBook } from './services/gutenbergApi';
-import { analyzeCharacters } from './Gutenberg/llmService';
+import { analyzeBook } from './Gutenberg/llmService';
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,11 +20,11 @@ function App() {
       setLoadingMessage('Downloading book from Project Gutenberg...');
       const bookText = await fetchBook(bookId);
       
-      setLoadingMessage('Analyzing characters with AI...');
-      const results = await analyzeCharacters(bookText);
+      setLoadingMessage('Analyzing book with AI (summary + characters)...');
+      const analysisResult = await analyzeBook(bookText);
       
-      setAnalysisResults(results);
-      console.log('Analysis complete:', results);
+      setAnalysisResults(analysisResult);
+      console.log('Analysis complete:', analysisResult);
       
     } catch (err) {
       setError(err.message);
@@ -67,7 +67,18 @@ function App() {
               </p>
             </div>
 
-            
+            {/* Book Summary */}
+            {analysisResults.summary && (
+              <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-6 border border-gray-700">
+                <h3 className="text-xl font-semibold mb-4 text-white flex items-center">
+                  <span className="w-2 h-8 bg-purple-400 rounded-full mr-3"></span>
+                  Book Summary
+                </h3>
+                <div className="bg-gray-700/50 rounded-lg p-4">
+                  <p className="text-gray-300 leading-relaxed whitespace-pre-line">{analysisResults.summary}</p>
+                </div>
+              </div>
+            )}
             <CharacterNetwork data={analysisResults} />
 
             

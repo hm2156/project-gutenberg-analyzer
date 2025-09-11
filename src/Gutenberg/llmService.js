@@ -2,15 +2,45 @@ import axios from 'axios';
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-export const analyzeCharacters = async (bookText) => {
+let requestCount = 0;
+let lastResetTime = Date.now();
+const MAX_REQUESTS_PER_MINUTE = 5; 
+
+const checkRateLimit = () => {
+  const now = Date.now();
+  const timeDiff = now - lastResetTime;
+
+
+  if (timeDiff > 60000) {
+    requestCount = 0;
+    lastResetTime = now;
+  }
+
+  if (requestCount >= MAX_REQUESTS_PER_MINUTE) {
+    throw new Error('Rate limit exceeded. Please wait a moment before trying again.');
+  }
+
+  requestCount++;
+};
+
+
+const addRequestDelay = () => {
+  return new Promise(resolve => setTimeout(resolve, 5000)); 
+};
+
+
+export const analyzeBook = async (bookText) => {
   try {
+    checkRateLimit();
+    await addRequestDelay();
+    
    
     const apiKey = process.env.GROQ_API_KEY || process.env.REACT_APP_GROQ_API_KEY;
 
- 
-    const maxTextLength = 10000; 
-    let truncatedText;
     
+    const maxTextLength = 10000;
+    let truncatedText;
+
     if (bookText.length > maxTextLength) {
       const chunkSize = Math.floor(maxTextLength / 3);
       const start = bookText.substring(0, chunkSize);
@@ -24,12 +54,13 @@ export const analyzeCharacters = async (bookText) => {
       truncatedText = bookText;
     }
 
-    const prompt = `Analyze this book text and identify the main characters and their interactions.
+    const prompt = `Analyze this book text and provide both a summary and character analysis.
 
 Text: ${truncatedText}
 
 Please return ONLY a JSON response in this exact format:
 {
+  "summary": "Write a concise book summary in plain text format. Include: 1. Main plot/theme (2-3 sentences), 2. Key themes and messages (2-3 sentences), 3. Writing style and genre, 4. Why someone should read it (1-2 sentences). Keep under 200 words and engaging. Do NOT use asterisks, bold text, headers, or any markdown formatting.",
   "characters": [
     {
       "name": "Character Name",
@@ -40,22 +71,22 @@ Please return ONLY a JSON response in this exact format:
   "interactions": [
     {
       "character1": "Character A",
-      "character2": "Character B", 
+      "character2": "Character B",
       "strength": 15,
       "description": "Nature of their relationship"
     }
   ]
 }
 
-IMPORTANT: Include ALL significant relationships between characters:
-- Family relationships (parent-child, siblings, relatives)
-- Romantic relationships (lovers, spouses, betrothed)
-- Social relationships (friends, enemies, rivals)
-- Professional relationships (mentor-student, employer-employee)
-- Any characters who speak to each other or are mentioned together
+IMPORTANT: 
+- For summary: Write in plain text only, no asterisks or markdown
+- Include ALL significant relationships between characters
+- Focus on the most important characters (limit to 8-12)
+- Count mentions and estimate interaction strength`;
 
-Focus on the most important characters (limit to 8-12) and ensure you capture their key relationships. Count mentions and estimate interaction strength based on how often they interact or are mentioned together.`;
-
+    console.log('Sending combined request to Groq API...');
+    console.log('Original text length:', bookText.length);
+    console.log('Truncated text length:', truncatedText.length);
 
     const response = await axios.post(
       GROQ_API_URL,
@@ -66,9 +97,9 @@ Focus on the most important characters (limit to 8-12) and ensure you capture th
             content: prompt
           }
         ],
-        model: "llama-3.1-8b-instant", 
+        model: "llama-3.1-8b-instant",
         temperature: 0.3,
-        max_tokens: 2500, 
+        max_tokens: 3000, 
         stream: false
       },
       {
@@ -80,33 +111,45 @@ Focus on the most important characters (limit to 8-12) and ensure you capture th
     );
 
     const result = response.data.choices[0].message.content;
-    
     console.log('Raw AI response:', result);
 
+    
     const jsonMatch = result.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       const analysis = JSON.parse(jsonMatch[0]);
+      console.log('Parsed analysis:', analysis);
+      
+      
+      if (analysis.summary) {
+        analysis.summary = analysis.summary
+          .replace(/\*\*/g, '')
+          .replace(/\*/g, '')
+          .replace(/#{1,6}\s/g, '')
+          .replace(/\n\s*\n/g, '\n')
+          .trim();
+      }
+      
       return analysis;
     } else {
-      throw new Error('LLM returned invalid format');
+        throw new Error('LLM returned invalid format');
     }
-    
+
   } catch (error) {
     console.error('Groq API Error:', error.response?.data || error.message);
-    
+
     if (error.response?.status === 401) {
       throw new Error('Invalid API key. Please check your Groq API key in the .env file.');
     }
-    
+
     if (error.response?.status === 400) {
       const errorDetails = error.response?.data?.error?.message || 'Bad request';
       throw new Error(`Groq API request failed: ${errorDetails}. Check console for details.`);
     }
-    
+
     if (error.response?.status === 429) {
       throw new Error('Rate limit exceeded. Please try again in a moment.');
     }
-    
+
     throw new Error(`AI analysis failed: ${error.message}`);
   }
 };

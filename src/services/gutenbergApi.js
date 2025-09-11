@@ -2,11 +2,11 @@ import axios from 'axios';
 
 export const fetchBook = async (bookId) => {
   try {
-
+    
     const proxyUrl = 'https://api.allorigins.win/raw?url=';
     const contentUrl = `https://www.gutenberg.org/files/${bookId}/${bookId}-0.txt`;
     const proxiedUrl = `${proxyUrl}${encodeURIComponent(contentUrl)}`;
-    
+
     const response = await axios.get(proxiedUrl);
     
   
